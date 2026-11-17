@@ -1,0 +1,9 @@
+/target
+*.log
+*.png.tmp
+.DS_Store
+# never commit credentials or sessions
+config.ini
+tdlib/
+tdlib_*/
+.env

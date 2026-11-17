@@ -1,0 +1,32 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Build (TDLib is downloaded by the build script)
+        run: cargo build --release
+        env:
+          # Optional: embed your own Telegram API credentials (repository secrets) so users do not have to enter them.
+          ECHOPING_API_ID: ${{ secrets.ECHOPING_API_ID }}
+          ECHOPING_API_HASH: ${{ secrets.ECHOPING_API_HASH }}
+      - name: Package
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force dist | Out-Null
+          Copy-Item target/release/echoping.exe, target/release/echoping-tui.exe dist/
+          Copy-Item target/release/*.dll dist/ -ErrorAction SilentlyContinue
+          Copy-Item README.md, LICENSE, NOTICE.md dist/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: echoping-windows
+          path: dist

@@ -1,0 +1,61 @@
+[package]
+name = "echoping"
+version = "0.1.0"
+edition = "2021"
+description = "Lightweight unofficial Telegram client for the terminal (TDLib + ratatui)"
+license = "MIT"
+readme = "README.md"
+keywords = ["telegram", "tui", "terminal", "client", "tdlib"]
+categories = ["command-line-utilities"]
+publish = false
+build = "build.rs"
+default-run = "echoping"
+
+[lib]
+name = "echoping"
+path = "src/lib.rs"
+
+[[bin]]
+name = "echoping"
+path = "src/bin/echoping.rs"
+
+[[bin]]
+name = "echoping-tui"
+path = "src/bin/echoping-tui.rs"
+
+[features]
+# По умолчанию сборочный скрипт сам скачивает готовую TDLib с GitHub.
+default = ["download"]
+download = ["tdlib-rs/download-tdlib"]
+# Для сборки с уже установленной TDLib (переменная LOCAL_TDLIB_PATH).
+local = ["tdlib-rs/local-tdlib"]
+
+[dependencies]
+ratatui = "0.26"
+crossterm = "0.27"
+chrono = { version = "0.4", default-features = false, features = ["clock"] }
+qrcode = { version = "0.14", default-features = false }
+image = { version = "0.25", default-features = false, features = ["png", "jpeg"] }
+rodio = { version = "0.20", default-features = false }
+opus-decoder = "0.1"
+ogg = "0.9"
+tdlib-rs = "1"
+tokio = { version = "1", features = ["rt", "sync", "time"] }
+serde_json = "1"
+unicode-width = "0.1"
+winit = "0.30"
+softbuffer = "0.4"
+fontdue = "0.9"
+
+[target.'cfg(windows)'.dependencies]
+tray-icon = "0.21"
+
+[build-dependencies]
+tdlib-rs = "1"
+
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true

@@ -1,0 +1,32 @@
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Build
+        run: cargo build --release
+        env:
+          ECHOPING_API_ID: ${{ secrets.ECHOPING_API_ID }}
+          ECHOPING_API_HASH: ${{ secrets.ECHOPING_API_HASH }}
+      - name: Package
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force dist/echoping | Out-Null
+          Copy-Item target/release/echoping.exe, target/release/echoping-tui.exe dist/echoping/
+          Copy-Item target/release/*.dll dist/echoping/ -ErrorAction SilentlyContinue
+          Copy-Item README.md, LICENSE, NOTICE.md dist/echoping/
+          Compress-Archive -Path dist/echoping -DestinationPath "echoping-${{ github.ref_name }}-windows-x64.zip"
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: echoping-*-windows-x64.zip
