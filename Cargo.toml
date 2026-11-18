@@ -1,6 +1,6 @@
 [package]
 name = "echoping"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "Lightweight unofficial Telegram client for the terminal (TDLib + ratatui)"
 license = "MIT"
